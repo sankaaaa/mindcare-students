@@ -68,7 +68,7 @@ function Header() {
         <header className={styles.header}>
             <div className={styles.logo}>
                 <Frame className={styles.frameIcon}/>
-                <div className={styles.logoText}>CareMatch</div>
+                <div className={styles.logoText}>MindCare Students</div>
             </div>
 
             <div className={styles.navLinkWrapper}>

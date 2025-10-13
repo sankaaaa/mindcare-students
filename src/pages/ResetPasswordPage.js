@@ -61,7 +61,7 @@ const ResetPasswordPage = () => {
         <div className="reset-page">
             <div className="logo">
                 <Frame className="frameIcon"/>
-                <div className="logoText">CareMatch</div>
+                <div className="logoText">MindCare Students</div>
             </div>
 
             <div className="reset-container">

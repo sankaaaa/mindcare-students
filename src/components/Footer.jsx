@@ -8,7 +8,7 @@ function Footer() {
         <footer className={styles.footer}>
                 <div className={styles.logo}>
                     <Frame className={styles.frameIcon}/>
-                    <div className={styles.logoText}>MindCare students</div>
+                    <div className={styles.logoText}>MindCare Students</div>
                 </div>
 
                 <div className={styles.legalInfo}>
@@ -24,7 +24,7 @@ function Footer() {
                 <div className={styles.contactInfo}>
                     <h3>Зв'язатися з нами</h3>
                     <a href="mailto:sanka@jetmonsters.me" className={styles.contactEmail}>
-                        sanka@jetmonsters.me
+                        ryan@jetmonsters.me
                     </a>
                 </div>
 

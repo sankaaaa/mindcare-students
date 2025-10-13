@@ -72,7 +72,7 @@ const LoginPage = () => {
         <div className="login-page">
             <div className="logo">
                 <Frame className="frameIcon"/>
-                <div className="logoText">CareMatch</div>
+                <div className="logoText">MindCare Students</div>
             </div>
 
             <div className="login-container">
@@ -80,10 +80,6 @@ const LoginPage = () => {
                     <h2>З поверненням!</h2>
                     <p>Введіть свої дані для входу в обліковий запис</p>
                 </div>
-
-                {/*<button className="google-button">*/}
-                {/*    <img src={googleIcon} alt="Google Icon" className="google-icon"/> Увійти з Google*/}
-                {/*</button>*/}
 
                 <div className="divider"></div>
 
