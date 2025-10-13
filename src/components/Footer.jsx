@@ -8,7 +8,7 @@ function Footer() {
         <footer className={styles.footer}>
                 <div className={styles.logo}>
                     <Frame className={styles.frameIcon}/>
-                    <div className={styles.logoText}>CareMatch</div>
+                    <div className={styles.logoText}>MindCare students</div>
                 </div>
 
                 <div className={styles.legalInfo}>
