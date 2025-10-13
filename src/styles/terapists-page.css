@@ -181,3 +181,9 @@ input[type="radio"]:checked {
 input::placeholder {
     color: #00410a;
 }
+
+.res {
+    font-family: 'Craftwork Grotesk', sans-serif;
+    color: #00410a;
+    margin-left: 40%;
+}

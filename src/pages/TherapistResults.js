@@ -166,7 +166,7 @@ const TherapistResults = () => {
         <div className="all-terapists-container">
             <Header/>
             <div className="therapist-results">
-                <h2>Результати пошуку</h2>
+                <h2 className="res">Результати пошуку</h2>
                 {loading ? (
                     <div className="banter-loader">
                         <div className="banter-loader__box"></div>

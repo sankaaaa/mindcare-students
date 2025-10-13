@@ -81,11 +81,11 @@ const LoginPage = () => {
                     <p>Введіть свої дані для входу в обліковий запис</p>
                 </div>
 
-                <button className="google-button">
-                    <img src={googleIcon} alt="Google Icon" className="google-icon"/> Увійти з Google
-                </button>
+                {/*<button className="google-button">*/}
+                {/*    <img src={googleIcon} alt="Google Icon" className="google-icon"/> Увійти з Google*/}
+                {/*</button>*/}
 
-                <div className="divider">або</div>
+                <div className="divider"></div>
 
                 <div className="input-container">
                     <input
