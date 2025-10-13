@@ -12,7 +12,7 @@
 }
 
 .placeholder-image {
-    width: 30%;
+    width: 32%;
     height: auto;
     max-width: 100%;
     object-fit: cover;
@@ -344,16 +344,13 @@
     margin-bottom: 10px;
 }
 
-
-
-
 .Group15 {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2rem;
-    margin-top: 2rem;
+    margin-top: 1rem;
     margin-bottom: 5%;
 }
 
