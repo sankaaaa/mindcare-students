@@ -25,8 +25,8 @@ const TherUserPage = () => {
 
             const {data, error} = await supabase
                 .from('doctors')
-                .select('first_name, last_name, specialization, experience, doc_description, email, phone_number, ' +
-                    'meet_fomat, city, doc_sex, doc_date, doc_session, doc_rev, doc_lang, doc_education, doc_addition, doc_way, doc_photo')
+                .select('first_name, last_name, specialization, experience, email, phone_number, ' +
+                    'meet_fomat, city, doc_sex, doc_date, doc_session, doc_rev, doc_lang, doc_education, doc_way, doc_photo')
                 .eq('doctor_id', storedDoctorId)
                 .single();
 
@@ -91,8 +91,7 @@ const TherUserPage = () => {
                                             className="info-label">Стать:</span> {doctorData.doc_sex}</p>
                                         <p className="info-item"><span
                                             className="info-label">Дата народження:</span> {doctorData.doc_date}</p>
-                                        <p className="info-item"><span
-                                            className="info-label">Про мене:</span> {doctorData.doc_description}</p>
+
                                     </section>
 
                                     <section className="section-doc">
@@ -129,9 +128,6 @@ const TherUserPage = () => {
 
                                     <section className="section-doc">
                                         <h2 className="section-title">Додаткова інформація</h2>
-                                        <p className="info-item"><span
-                                            className="info-label">Додаткова інформація:</span> {doctorData.doc_addition}
-                                        </p>
                                         <p className="info-item"><span
                                             className="info-label">Шлях:</span> {doctorData.doc_way}</p>
                                     </section>

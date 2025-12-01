@@ -27,7 +27,7 @@ const TherapistDetails = () => {
                     .from("doctors")
                     .select(
                         "doctor_id, first_name, last_name, experience, city, specialization, doc_photo, " +
-                        "doc_date, meet_fomat, doc_session, doc_rev, doc_lang, doc_about, doc_education, doc_addition, doc_way"
+                        "doc_date, meet_fomat, doc_session, doc_rev, doc_lang, doc_about, doc_education, doc_way"
                     )
                     .eq("doctor_id", id)
                     .single();
@@ -273,7 +273,6 @@ const TherapistDetails = () => {
                 {activeSection === 'education' && (
                     <div className="section-content">
                         <p>{therapist.doc_education}</p>
-                        <p>{therapist.doc_addition}</p>
                     </div>
                 )}
                 {activeSection === 'work' && (
