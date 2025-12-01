@@ -149,7 +149,27 @@ const TherCalendar = () => {
             console.error('Error booking session:', error);
             alert('Помилка під час бронювання.');
         } else {
-            alert('Сеанс підтверджено!');
+            const patientEmail = localStorage.getItem("email");
+
+            const { data: doctorData } = await supabase
+                .from("doctors")
+                .select("first_name, last_name")
+                .eq("doctor_id", id)
+                .single();
+
+            await fetch("http://localhost:4000/api/send-booking-email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: patientEmail,
+                    therapistName: `${doctorData.first_name} ${doctorData.last_name}`,
+                    date: `${selectedDate}.${currentMonth + 1}.${currentYear}`,
+                    time: selectedTime
+                })
+            });
+
+            alert("Сеанс підтверджено! Лист надіслано на вашу пошту.");
+
             setSessionDates(prevDates =>
                 prevDates.map(session =>
                     session.date === selectedSession.date

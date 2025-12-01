@@ -75,12 +75,16 @@ function Header() {
                 <button onClick={handleAboutUsClick} className={styles.navLink}>
                     Про нас
                 </button>
+
                 <Button onPress={handleAllTerapists} className={styles.navLink}>
                     Фахівці
                 </Button>
-                <Button onPress={handleFindTherapist} className={styles.navLink}>
-                    Підібрати фахівця
-                </Button>
+
+                {status === 'patient' && (
+                    <Button onPress={handleFindTherapist} className={styles.navLink}>
+                        Підібрати фахівця
+                    </Button>
+                )}
 
                 {status === 'patient' && (
                     <Button onPress={handleMyPage} className={styles.navLink}>

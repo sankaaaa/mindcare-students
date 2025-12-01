@@ -80,6 +80,10 @@ const CreateAccount = () => {
                 setError('Помилка при створенні акаунту: ' + error.message);
             } else {
                 console.log('Пацієнта додано успішно:', data);
+
+                localStorage.setItem("email", formData.email);
+                localStorage.setItem("patient_id", nextPatientId);
+                localStorage.setItem("status", "patient");
                 navigate('/login');
             }
         } catch (error) {

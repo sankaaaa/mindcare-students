@@ -7,9 +7,12 @@
     "@nextui-org/use-theme": "^2.1.1",
     "@supabase/realtime-js": "^2.11.3",
     "@supabase/supabase-js": "^2.47.7",
+    "cors": "^2.8.5",
     "cra-template": "1.2.0",
+    "express": "^5.1.0",
     "framer-motion": "^11.13.5",
     "next-themes": "^0.4.4",
+    "nodemailer": "^7.0.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.0.2",
@@ -19,7 +22,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "start:ws": "node src/config/server.js",
+    "start:ws": "node --env-file=.env src/config/server.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -47,4 +50,3 @@
     "tailwindcss": "^3.4.16"
   }
 }
-

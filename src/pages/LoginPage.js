@@ -32,7 +32,7 @@ const LoginPage = () => {
                 } else {
                     const {data: patientData, error: patientError} = await supabase
                         .from('patients')
-                        .select('patient_id')
+                        .select('patient_id, email')
                         .or(`pat_login.eq.${email},email.eq.${email}`)
                         .eq('pat_password', password);
 
@@ -43,6 +43,7 @@ const LoginPage = () => {
                     if (patientData.length === 1) {
                         console.log('Пацієнт увійшов успішно: ', patientData[0]);
                         localStorage.setItem('patient_id', patientData[0].patient_id);
+                        localStorage.setItem('email', patientData[0].email);
                         localStorage.setItem('status', 'patient');
                         navigate('/main');
                     } else {

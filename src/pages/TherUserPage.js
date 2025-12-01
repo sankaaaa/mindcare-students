@@ -11,6 +11,8 @@ const TherUserPage = () => {
     const {doctor_id} = useParams();
     const [doctorData, setDoctorData] = useState(null);
     const [activeTab, setActiveTab] = useState('general');
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedDoctor, setEditedDoctor] = useState({});
     const navigate = useNavigate();
     const storedDoctorId = localStorage.getItem('doctor_id');
 
@@ -35,6 +37,7 @@ const TherUserPage = () => {
                 alert('Не вдалося завантажити дані лікаря.');
             } else {
                 setDoctorData(data);
+                setEditedDoctor(data);
             }
         };
 
@@ -44,6 +47,26 @@ const TherUserPage = () => {
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
+    };
+
+    const saveChanges = async () => {
+        try {
+            const { error } = await supabase
+                .from("doctors")
+                .update({
+                    ...editedDoctor
+                })
+                .eq("doctor_id", storedDoctorId);
+
+            if (error) {
+                alert("Помилка при збереженні: " + error.message);
+            } else {
+                alert("Зміни збережено!");
+                setDoctorData(editedDoctor);
+            }
+        } catch (e) {
+            console.error(e);
+        }
     };
 
     return (
@@ -74,23 +97,98 @@ const TherUserPage = () => {
                                 </label>
                             </div>
 
+                            <div className="edit-btn-container">
+                                <button
+                                    className="edit-btn"
+                                    onClick={() => {
+                                        if (isEditing) saveChanges();
+                                        setIsEditing(!isEditing);
+                                    }}
+                                >
+                                    {isEditing ? "Зберегти" : "Редагувати"}
+                                </button>
+                            </div>
+
                             {activeTab === 'general' && (
                                 <div className="card-doc">
                                     <section id="gen-ttl" className="section-doc">
                                         <h2 className="section-title">Загальна інформація</h2>
-                                        <p className="info-item"><span
-                                            className="info-label">Ім'я:</span> {doctorData.first_name}</p>
-                                        <p className="info-item"><span
-                                            className="info-label">Прізвище:</span> {doctorData.last_name}</p>
-                                        <p className="info-item"><span
-                                            className="info-label">Кваліфікація:</span> {doctorData.specialization}</p>
-                                        <p className="info-item"><span
-                                            className="info-label">Досвід роботи:</span> {doctorData.experience} років
+                                        <p className="info-item">
+                                            <span className="info-label">Ім'я:</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedDoctor.first_name}
+                                                    onChange={(e) =>
+                                                        setEditedDoctor({...editedDoctor, first_name: e.target.value})
+                                                    }
+                                                />
+                                            ) : doctorData.first_name}
                                         </p>
-                                        <p className="info-item"><span
-                                            className="info-label">Стать:</span> {doctorData.doc_sex}</p>
-                                        <p className="info-item"><span
-                                            className="info-label">Дата народження:</span> {doctorData.doc_date}</p>
+                                        <p className="info-item">
+                                            <span className="info-label">Прізвище:</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedDoctor.last_name}
+                                                    onChange={(e) =>
+                                                        setEditedDoctor({...editedDoctor, last_name: e.target.value})
+                                                    }
+                                                />
+                                            ) : doctorData.last_name}
+                                        </p>
+                                        <p className="info-item">
+                                            <span className="info-label">Кваліфікація:</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedDoctor.specialization}
+                                                    onChange={(e) =>
+                                                        setEditedDoctor({...editedDoctor, specialization: e.target.value})
+                                                    }
+                                                />
+                                            ) : doctorData.specialization}
+                                        </p>
+                                        <p className="info-item">
+                                            <span className="info-label">Досвід роботи:</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    value={editedDoctor.experience}
+                                                    onChange={(e) =>
+                                                        setEditedDoctor({...editedDoctor, experience: Number(e.target.value)})
+                                                    }
+                                                />
+                                            ) : `${doctorData.experience} років`}
+                                        </p>
+                                        <p className="info-item">
+                                            <span className="info-label">Стать:</span>
+                                            {isEditing ? (
+                                                <select
+                                                    value={editedDoctor.doc_sex}
+                                                    onChange={(e) =>
+                                                        setEditedDoctor({...editedDoctor, doc_sex: e.target.value})
+                                                    }
+                                                >
+                                                    <option value="Чоловік">Чоловік</option>
+                                                    <option value="Жінка">Жінка</option>
+                                                    <option value="Інше">Інше</option>
+                                                </select>
+                                            ) : doctorData.doc_sex}
+                                        </p>
+                                        <p className="info-item">
+                                            <span className="info-label">Дата народження:</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="date"
+                                                    value={editedDoctor.doc_date?.substring(0, 10) || ""}
+                                                    onChange={(e) =>
+                                                        setEditedDoctor({...editedDoctor, doc_date: e.target.value})
+                                                    }
+                                                />
+                                            ) : doctorData.doc_date}
+                                        </p>
 
                                     </section>
 
@@ -100,36 +198,128 @@ const TherUserPage = () => {
 
                                     <section className="section-doc">
                                         <h2 className="section-title">Контактні дані</h2>
-                                        <p className="info-item"><span
-                                            className="info-label">Email:</span> {doctorData.email}</p>
-                                        <p className="info-item"><span
-                                            className="info-label">Телефон:</span> {doctorData.phone_number}</p>
-                                        <p className="info-item"><span
-                                            className="info-label">Формат зустрічі:</span> {doctorData.meet_fomat}</p>
-                                        <p className="info-item"><span
-                                            className="info-label">Місто:</span> {doctorData.city}</p>
+                                        <p className="info-item">
+                                            <span className="info-label">Email:</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedDoctor.email}
+                                                    onChange={(e) =>
+                                                        setEditedDoctor({...editedDoctor, email: e.target.value})
+                                                    }
+                                                />
+                                            ) : doctorData.email}
+                                        </p>
+                                        <p className="info-item">
+                                            <span className="info-label">Телефон:</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedDoctor.phone_number}
+                                                    onChange={(e) =>
+                                                        setEditedDoctor({...editedDoctor, phone_number: e.target.value})
+                                                    }
+                                                />
+                                            ) : doctorData.phone_number}
+                                        </p>
+                                        <p className="info-item">
+                                            <span className="info-label">Формат зустрічі:</span>
+                                            {isEditing ? (
+                                                <select
+                                                    value={editedDoctor.meet_fomat}
+                                                    onChange={(e) =>
+                                                        setEditedDoctor({...editedDoctor, meet_fomat: e.target.value})
+                                                    }
+                                                >
+                                                    <option value="Онлайн">Онлайн</option>
+                                                    <option value="Офлайн">Офлайн</option>
+                                                </select>
+                                            ) : doctorData.meet_fomat}
+                                        </p>
+                                        <p className="info-item">
+                                            <span className="info-label">Місто:</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedDoctor.city}
+                                                    onChange={(e) =>
+                                                        setEditedDoctor({...editedDoctor, city: e.target.value})
+                                                    }
+                                                />
+                                            ) : doctorData.city}
+                                        </p>
                                     </section>
 
                                     <section className="section-doc">
                                         <h2 className="section-title">Професійна інформація</h2>
-                                        <p className="info-item"><span
-                                            className="info-label">Сесії:</span> {doctorData.doc_session}</p>
-                                        <p className="info-item"><span
-                                            className="info-label">Рев'ю:</span> {doctorData.doc_rev}</p>
-                                        <p className="info-item"><span
-                                            className="info-label">Мови:</span> {doctorData.doc_lang}</p>
+                                        <p className="info-item">
+                                            <span className="info-label">Сесії:</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedDoctor.doc_session}
+                                                    onChange={(e) =>
+                                                        setEditedDoctor({...editedDoctor, doc_session: e.target.value})
+                                                    }
+                                                />
+                                            ) : doctorData.doc_session}
+                                        </p>
+                                        <p className="info-item">
+                                            <span className="info-label">Рев'ю:</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedDoctor.doc_rev}
+                                                    onChange={(e) =>
+                                                        setEditedDoctor({...editedDoctor, doc_rev: e.target.value})
+                                                    }
+                                                />
+                                            ) : doctorData.doc_rev}
+                                        </p>
+                                        <p className="info-item">
+                                            <span className="info-label">Мови:</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedDoctor.doc_lang}
+                                                    onChange={(e) =>
+                                                        setEditedDoctor({...editedDoctor, doc_lang: e.target.value})
+                                                    }
+                                                />
+                                            ) : doctorData.doc_lang}
+                                        </p>
                                     </section>
 
                                     <section className="section-doc">
                                         <h2 className="section-title">Освіта</h2>
-                                        <p className="info-item"><span
-                                            className="info-label">Освіта:</span> {doctorData.doc_education}</p>
+                                        <p className="info-item">
+                                            <span className="info-label">Освіта:</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedDoctor.doc_education}
+                                                    onChange={(e) =>
+                                                        setEditedDoctor({...editedDoctor, doc_education: e.target.value})
+                                                    }
+                                                />
+                                            ) : doctorData.doc_education}
+                                        </p>
                                     </section>
 
                                     <section className="section-doc">
                                         <h2 className="section-title">Додаткова інформація</h2>
-                                        <p className="info-item"><span
-                                            className="info-label">Шлях:</span> {doctorData.doc_way}</p>
+                                        <p className="info-item">
+                                            <span className="info-label">Шлях:</span>
+                                            {isEditing ? (
+                                                <input
+                                                    type="text"
+                                                    value={editedDoctor.doc_way}
+                                                    onChange={(e) =>
+                                                        setEditedDoctor({...editedDoctor, doc_way: e.target.value})
+                                                    }
+                                                />
+                                            ) : doctorData.doc_way}
+                                        </p>
                                     </section>
                                 </div>
                             )}

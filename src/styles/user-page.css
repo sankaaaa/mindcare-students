@@ -96,6 +96,35 @@
     color: var(--main-color);
 }
 
+.edit-btn-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.edit-btn {
+    background-color: var(--main-color);
+    color: white;
+    border: none;
+    padding: 12px 26px;
+    font-size: 18px;
+    border-radius: 8px;
+    font-family: var(--font-family);
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+.edit-btn:hover {
+    background-color: #016c12;
+    transform: translateY(-2px);
+}
+
+.edit-btn:active {
+    background-color: #003507;
+    transform: translateY(0);
+}
+
 .appointment-item {
     margin-bottom: 45px;
     padding: 10px 30px;
