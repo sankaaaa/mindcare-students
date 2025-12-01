@@ -34,6 +34,16 @@ const ResetPasswordPage = () => {
                         throw updateError;
                     }
 
+                    try {
+                        await fetch("http://localhost:4000/send-password-changed-email", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ email }),
+                        });
+                    } catch (mailErr) {
+                        console.error("Помилка відправки листа про зміну пароля:", mailErr);
+                    }
+
                     setSuccess('Пароль успішно змінено!');
                     setError('');
                     setTimeout(() => navigate('/login'), 2000);

@@ -85,5 +85,16 @@ app.post("/send-therapist-cancel", async (req, res) => {
     }
 });
 
+app.post("/send-password-changed-email", async (req, res) => {
+    try {
+        const { email } = req.body;
+        await emailProvider.sendPasswordChangedEmail(email);
+        res.json({ success: true });
+    } catch (err) {
+        console.error("send-password-changed-email error:", err);
+        res.status(500).json({ error: true });
+    }
+});
+
 const PORT = 4000;
 app.listen(PORT, () => console.log("Server started on port", PORT));

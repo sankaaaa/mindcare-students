@@ -114,4 +114,16 @@ export class EmailProvider {
             `
         );
     }
+
+    async sendPasswordChangedEmail(to) {
+        return this.sendMail(
+            to,
+            "Пароль успішно змінено",
+            `
+        <h2>Ваш пароль було змінено</h2>
+        <p>Якщо це були не ви, негайно змініть пароль ще раз та зверніться в підтримку.</p>
+        <p style="color:gray; font-size:12px;">Це автоматичний лист — не відповідайте на нього.</p>
+        `
+        );
+    }
 }

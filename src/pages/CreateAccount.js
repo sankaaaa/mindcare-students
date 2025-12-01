@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import '../styles/create-account.css';
 import {ReactComponent as Frame} from '../assets/Frame.svg';
 import supabase from '../config/databaseClient';
@@ -7,6 +7,7 @@ import supabase from '../config/databaseClient';
 const CreateAccount = () => {
     const [currentStep, setCurrentStep] = useState(1);
     const [formData, setFormData] = useState({
+        role: '',          // 'patient' або 'doctor'
         firstName: '',
         lastName: '',
         gender: '',
@@ -22,92 +23,147 @@ const CreateAccount = () => {
 
     const handleChange = (e) => {
         const {name, value, type, checked} = e.target;
-        setFormData({
-            ...formData,
+        setFormData(prev => ({
+            ...prev,
             [name]: type === 'checkbox' ? checked : value,
-        });
+        }));
     };
 
     const nextStep = () => {
+        // мінімальна валідація по кроках
+        if (currentStep === 1) {
+            if (!formData.role) {
+                return setError("Будь ласка, оберіть тип акаунту.");
+            }
+            if (!formData.firstName || !formData.lastName || !formData.gender || !formData.birthDate) {
+                return setError("Заповніть всі поля цього кроку.");
+            }
+        }
+        if (currentStep === 2) {
+            if (!formData.email || !formData.phone || !formData.address) {
+                return setError("Заповніть всі поля цього кроку.");
+            }
+        }
+
+        setError('');
         setCurrentStep((prevStep) => prevStep + 1);
     };
 
     const prevStep = () => {
+        setError('');
         setCurrentStep((prevStep) => prevStep - 1);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
 
-        let genderInEnglish = '';
-        if (formData.gender === 'male') {
-            genderInEnglish = 'male';
-        } else if (formData.gender === 'female') {
-            genderInEnglish = 'female';
-        } else if (formData.gender === 'another') {
-            genderInEnglish = 'another';
+        if (!formData.role) {
+            setError("Будь ласка, оберіть тип акаунту (студент чи спеціаліст).");
+            return;
         }
 
+        let genderInEnglish = '';
+        if (formData.gender === 'male') genderInEnglish = 'male';
+        else if (formData.gender === 'female') genderInEnglish = 'female';
+        else if (formData.gender === 'another') genderInEnglish = 'another';
+
         try {
-            const {data: lastPatient, error: lastPatientError} = await supabase
-                .from('patients')
-                .select('patient_id')
-                .order('patient_id', {ascending: false})
-                .limit(1);
+            if (formData.role === 'patient') {
+                // ===== РЕЄСТРАЦІЯ СТУДЕНТА =====
+                const {data: lastPatient, error: lastPatientError} = await supabase
+                    .from('patients')
+                    .select('patient_id')
+                    .order('patient_id', {ascending: false})
+                    .limit(1);
 
-            if (lastPatientError) throw lastPatientError;
+                if (lastPatientError) throw lastPatientError;
 
-            const nextPatientId = lastPatient && lastPatient[0]
-                ? lastPatient[0].patient_id + 1
-                : 3;
+                const nextPatientId = lastPatient && lastPatient[0]
+                    ? lastPatient[0].patient_id + 1
+                    : 1;
 
-            const {data, error} = await supabase
-                .from('patients')
-                .insert([
-                    {
-                        patient_id: nextPatientId,
-                        first_name: formData.firstName,
-                        last_name: formData.lastName,
-                        date_of_birth: formData.birthDate,
-                        gender: genderInEnglish,
-                        email: formData.email,
-                        phone_number: formData.phone,
-                        address: formData.address,
-                        pat_login: formData.login,
-                        pat_password: formData.password,
-                    }
-                ]);
+                const {error: insertError} = await supabase
+                    .from('patients')
+                    .insert([
+                        {
+                            patient_id: nextPatientId,
+                            first_name: formData.firstName,
+                            last_name: formData.lastName,
+                            date_of_birth: formData.birthDate,
+                            gender: genderInEnglish,
+                            email: formData.email,
+                            phone_number: formData.phone,
+                            address: formData.address,
+                            pat_login: formData.login,
+                            pat_password: formData.password,
+                        }
+                    ]);
 
-            if (error) {
-                setError('Помилка при створенні акаунту: ' + error.message);
-            } else {
-                console.log('Пацієнта додано успішно:', data);
+                if (insertError) throw insertError;
 
-                // Зберігаємо базовий стан у localStorage (якщо треба)
+                // Зберігаємо ідентифікатори в localStorage
                 localStorage.setItem("email", formData.email);
                 localStorage.setItem("patient_id", nextPatientId);
                 localStorage.setItem("status", "patient");
 
-                // Надсилаємо вітальний лист
-                try {
-                    await fetch("http://localhost:4000/send-registration-email", {
-                        method: "POST",
-                        headers: {"Content-Type": "application/json"},
-                        body: JSON.stringify({
-                            email: formData.email,
-                            name: formData.firstName
-                        })
-                    });
-                } catch (mailErr) {
-                    console.error("Помилка відправки вітального листа:", mailErr);
-                    // тут можна не фейлити реєстрацію, просто залогати
-                }
+            } else if (formData.role === 'doctor') {
+                // ===== РЕЄСТРАЦІЯ СПЕЦІАЛІСТА =====
+                const {data: lastDoctor, error: lastDoctorError} = await supabase
+                    .from('doctors')
+                    .select('doctor_id')
+                    .order('doctor_id', {ascending: false})
+                    .limit(1);
 
-                navigate('/login');
+                if (lastDoctorError) throw lastDoctorError;
+
+                const nextDoctorId = lastDoctor && lastDoctor[0]
+                    ? lastDoctor[0].doctor_id + 1
+                    : 1;
+
+                const {error: insertError} = await supabase
+                    .from('doctors')
+                    .insert([
+                        {
+                            doctor_id: nextDoctorId,
+                            first_name: formData.firstName,
+                            last_name: formData.lastName,
+                            email: formData.email,
+                            phone_number: formData.phone,
+                            city: formData.address,
+                            doc_login: formData.login,
+                            doc_password: formData.password,
+                            doc_sex: genderInEnglish,
+                            doc_date: formData.birthDate,
+                            // інші поля (specialization, meet_fomat і т.д.) можна редагувати пізніше в кабінеті
+                        }
+                    ]);
+
+                if (insertError) throw insertError;
+
+                localStorage.setItem("email", formData.email);
+                localStorage.setItem("doctor_id", nextDoctorId);
+                localStorage.setItem("status", "doctor");
             }
+
+            // Спроба надіслати вітальний лист (не ламаємо реєстрацію, якщо лист не відправився)
+            try {
+                await fetch("http://localhost:4000/send-registration-email", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        email: formData.email,
+                        name: formData.firstName
+                    })
+                });
+            } catch (mailErr) {
+                console.error("Помилка відправки реєстраційного листа:", mailErr);
+            }
+
+            navigate('/login');
         } catch (error) {
-            setError('Помилка при обробці запиту: ' + error.message);
-            console.error('Помилка при додаванні пацієнта:', error);
+            console.error('Помилка при створенні акаунту:', error);
+            setError('Помилка при створенні акаунту: ' + (error.message || 'невідома помилка'));
         }
     };
 
@@ -116,7 +172,7 @@ const CreateAccount = () => {
         <div className="createacc-page">
             <div className="logo">
                 <Frame className="frameIcon"/>
-                <div className="logoText">CareMatch</div>
+                <div className="logoText">MindCare Students</div>
             </div>
 
             <div className="createacc-container">
@@ -126,6 +182,7 @@ const CreateAccount = () => {
                 </div>
 
                 <form onSubmit={handleSubmit}>
+                    {/* КРОК 1 */}
                     {currentStep === 1 && (
                         <>
                             <div className="input-container">
@@ -194,6 +251,7 @@ const CreateAccount = () => {
                         </>
                     )}
 
+                    {/* КРОК 2 */}
                     {currentStep === 2 && (
                         <>
                             <div className="input-container">
@@ -235,6 +293,7 @@ const CreateAccount = () => {
                         </>
                     )}
 
+                    {/* КРОК 3 */}
                     {currentStep === 3 && (
                         <>
                             <div className="input-container">
