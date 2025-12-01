@@ -32,7 +32,7 @@ const LoginPage = () => {
                 } else {
                     const {data: patientData, error: patientError} = await supabase
                         .from('patients')
-                        .select('patient_id, email')
+                        .select('patient_id, email, first_name, last_name')
                         .or(`pat_login.eq.${email},email.eq.${email}`)
                         .eq('pat_password', password);
 
@@ -41,12 +41,17 @@ const LoginPage = () => {
                     }
 
                     if (patientData.length === 1) {
-                        console.log('Пацієнт увійшов успішно: ', patientData[0]);
-                        localStorage.setItem('patient_id', patientData[0].patient_id);
-                        localStorage.setItem('email', patientData[0].email);
+                        const patient = patientData[0];
+                        console.log('Пацієнт увійшов успішно: ', patient);
+
+                        localStorage.setItem('patient_id', patient.patient_id);
                         localStorage.setItem('status', 'patient');
+                        localStorage.setItem('email', patient.email);
+                        localStorage.setItem('patient_name', `${patient.first_name} ${patient.last_name}`);
+
                         navigate('/main');
-                    } else {
+                    }
+                    else {
                         setError('Невірний логін або пароль');
                         localStorage.removeItem('patient_id');
                         localStorage.removeItem('doctor_id');

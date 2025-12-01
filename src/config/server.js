@@ -8,63 +8,79 @@ app.use(express.json());
 
 const emailProvider = new EmailProvider();
 
-app.post("/api/send-registration-email", async (req, res) => {
+app.post("/send-registration-email", async (req, res) => {
     try {
         const { email, name } = req.body;
         await emailProvider.sendRegistrationEmail(email, name);
         res.json({ success: true });
     } catch (err) {
-        console.error(err);
+        console.error("send-registration-email error:", err);
         res.status(500).json({ error: true });
     }
 });
 
-app.post("/api/send-booking-email", async (req, res) => {
+app.post("/send-booking-email", async (req, res) => {
     try {
         const { email, therapistName, date, time } = req.body;
         await emailProvider.sendBookingEmail(email, therapistName, date, time);
         res.json({ success: true });
-    } catch {
+    } catch (err) {
+        console.error("send-booking-email error:", err);
         res.status(500).json({ error: true });
     }
 });
 
-app.post("/api/send-cancel-email", async (req, res) => {
+app.post("/send-cancel-email", async (req, res) => {
     try {
         const { email, therapistName, date, time } = req.body;
         await emailProvider.sendCancelEmail(email, therapistName, date, time);
         res.json({ success: true });
-    } catch {
+    } catch (err) {
+        console.error("send-cancel-email error:", err);
         res.status(500).json({ error: true });
     }
 });
 
-app.post("/api/send-reminder-24h", async (req, res) => {
+app.post("/send-reminder-24h", async (req, res) => {
     try {
         const { email, therapistName, date, time } = req.body;
         await emailProvider.sendReminder24h(email, therapistName, date, time);
         res.json({ success: true });
-    } catch {
+    } catch (err) {
+        console.error("send-reminder-24h error:", err);
         res.status(500).json({ error: true });
     }
 });
 
-app.post("/api/send-reminder-1h", async (req, res) => {
+app.post("/send-reminder-1h", async (req, res) => {
     try {
         const { email, therapistName, date, time } = req.body;
         await emailProvider.sendReminder1h(email, therapistName, date, time);
         res.json({ success: true });
-    } catch {
+    } catch (err) {
+        console.error("send-reminder-1h error:", err);
         res.status(500).json({ error: true });
     }
 });
 
-app.post("/api/send-new-client-email", async (req, res) => {
+app.post("/send-new-client-email", async (req, res) => {
     try {
         const { email, clientName, date, time } = req.body;
         await emailProvider.notifyTherapistNewClient(email, clientName, date, time);
         res.json({ success: true });
-    } catch {
+    } catch (err) {
+        console.error("send-new-client-email error:", err);
+        res.status(500).json({ error: true });
+    }
+});
+
+app.post("/send-therapist-cancel", async (req, res) => {
+    try {
+        const { email, patientName, date, time } = req.body;
+        await emailProvider.notifyTherapistCancel(email, patientName, date, time);
+        res.json({ success: true });
+    } catch (err) {
+        console.error("send-therapist-cancel error:", err);
         res.status(500).json({ error: true });
     }
 });

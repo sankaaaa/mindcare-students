@@ -144,3 +144,19 @@
     display: flex;
     justify-content: center;
 }
+
+.cancel-btn, .edit-btn {
+    background: var(--main-color);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+.cancel-btn:hover, .edit-btn:hover {
+    opacity: 0.9;
+}
+

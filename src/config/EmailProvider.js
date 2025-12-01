@@ -1,4 +1,6 @@
 import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+dotenv.config();
 
 export class EmailProvider {
     constructor() {
@@ -96,6 +98,19 @@ export class EmailProvider {
             <p>Пацієнт <strong>${clientName}</strong> записався на консультацію.</p>
             <p><strong>Дата:</strong> ${date}</p>
             <p><strong>Час:</strong> ${time}</p>
+            `
+        );
+    }
+
+    async notifyTherapistCancel(to, patientName, date, time) {
+        return this.sendMail(
+            to,
+            "Клієнт скасував запис",
+            `
+            <h2>Запис скасовано</h2>
+            <p>Пацієнт <strong>${patientName}</strong> скасував запис.</p>
+            <p><strong>Дата:</strong> ${date}<br /><strong>Час:</strong> ${time}</p>
+            <p style="color:gray; font-size:12px;">Якщо виникли питання — перевірте свій кабінет або зв'яжіться з підтримкою.</p>
             `
         );
     }

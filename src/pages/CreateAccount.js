@@ -57,7 +57,9 @@ const CreateAccount = () => {
 
             if (lastPatientError) throw lastPatientError;
 
-            const nextPatientId = lastPatient[0] ? lastPatient[0].patient_id + 1 : 3;
+            const nextPatientId = lastPatient && lastPatient[0]
+                ? lastPatient[0].patient_id + 1
+                : 3;
 
             const {data, error} = await supabase
                 .from('patients')
@@ -81,9 +83,26 @@ const CreateAccount = () => {
             } else {
                 console.log('Пацієнта додано успішно:', data);
 
+                // Зберігаємо базовий стан у localStorage (якщо треба)
                 localStorage.setItem("email", formData.email);
                 localStorage.setItem("patient_id", nextPatientId);
                 localStorage.setItem("status", "patient");
+
+                // Надсилаємо вітальний лист
+                try {
+                    await fetch("http://localhost:4000/send-registration-email", {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify({
+                            email: formData.email,
+                            name: formData.firstName
+                        })
+                    });
+                } catch (mailErr) {
+                    console.error("Помилка відправки вітального листа:", mailErr);
+                    // тут можна не фейлити реєстрацію, просто залогати
+                }
+
                 navigate('/login');
             }
         } catch (error) {
