@@ -69,6 +69,49 @@ const TherUserPage = () => {
         }
     };
 
+    const handleDeleteAccount = async () => {
+        if (!window.confirm("Ви впевнені, що хочете видалити обліковий запис спеціаліста? Цю дію не можна скасувати.")) {
+            return;
+        }
+
+        try {
+            // 1. Видаляємо всі слоти / записи цього лікаря
+            await supabase
+                .from('times')
+                .delete()
+                .eq('doctor_id', storedDoctorId);
+
+            // 2. Видаляємо самого лікаря
+            const { error } = await supabase
+                .from('doctors')
+                .delete()
+                .eq('doctor_id', storedDoctorId);
+
+            if (error) {
+                console.error("Помилка видалення лікаря:", error);
+                alert("Не вдалося видалити обліковий запис. Спробуйте пізніше.");
+                return;
+            }
+
+            // 3. Чистимо localStorage / sessionStorage
+            localStorage.removeItem('status');
+            localStorage.removeItem('patient_id');
+            localStorage.removeItem('doctor_id');
+            localStorage.removeItem('email');
+
+            sessionStorage.removeItem('status');
+            sessionStorage.removeItem('patient_id');
+            sessionStorage.removeItem('doctor_id');
+
+            alert("Обліковий запис спеціаліста успішно видалено.");
+            navigate('/login');
+        } catch (err) {
+            console.error("Помилка при видаленні акаунту лікаря:", err);
+            alert("Не вдалося видалити обліковий запис. Спробуйте пізніше.");
+        }
+    };
+
+
     return (
         <>
             <Header/>
@@ -330,6 +373,15 @@ const TherUserPage = () => {
                                 </div>
                             )}
 
+                        </div>
+
+                        <div className="delete-account-wrapper">
+                            <button
+                                className="delete-account-btn"
+                                onClick={handleDeleteAccount}
+                            >
+                                Видалити обліковий запис
+                            </button>
                         </div>
                         <Footer/>
                     </div>

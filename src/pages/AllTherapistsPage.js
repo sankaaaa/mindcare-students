@@ -10,7 +10,7 @@ import GenderFilter from "../components/GenderFilter";
 import MeetFormatFilter from "../components/MeetFormatFilter";
 import '../styles/loader.css';
 
-const AllTerapistsPage = () => {
+const AllTherapistsPage = () => {
     const [therapists, setTherapists] = useState([]);
     const [categories, setCategories] = useState([]);
     const [specializations, setSpecializations] = useState([]);
@@ -185,4 +185,4 @@ const AllTerapistsPage = () => {
     );
 };
 
-export default AllTerapistsPage;
+export default AllTherapistsPage;

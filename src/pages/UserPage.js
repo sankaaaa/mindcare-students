@@ -198,6 +198,49 @@ const UserPage = () => {
         }
     };
 
+    const handleDeleteAccount = async () => {
+        if (!window.confirm("Ви впевнені, що хочете видалити обліковий запис? Цю дію не можна скасувати.")) {
+            return;
+        }
+
+        try {
+            // 1. Звільняємо всі записи цього пацієнта (щоб не висіли заброньованими)
+            await supabase
+                .from('times')
+                .update({ patient: null, is_booked: false })
+                .eq('patient', storedPatientId);
+
+            // 2. Видаляємо самого пацієнта
+            const { error } = await supabase
+                .from('patients')
+                .delete()
+                .eq('patient_id', storedPatientId);
+
+            if (error) {
+                console.error("Помилка видалення пацієнта:", error);
+                alert("Не вдалося видалити обліковий запис. Спробуйте пізніше.");
+                return;
+            }
+
+            // 3. Чистимо localStorage / sessionStorage
+            localStorage.removeItem('status');
+            localStorage.removeItem('patient_id');
+            localStorage.removeItem('doctor_id');
+            localStorage.removeItem('email');
+
+            sessionStorage.removeItem('status');
+            sessionStorage.removeItem('patient_id');
+            sessionStorage.removeItem('doctor_id');
+
+            // 4. Перекидаємо на логін
+            alert("Обліковий запис успішно видалено.");
+            navigate('/login');
+        } catch (err) {
+            console.error("Помилка при видаленні акаунту:", err);
+            alert("Не вдалося видалити обліковий запис. Спробуйте пізніше.");
+        }
+    };
+
 
     return (
         <>
@@ -375,6 +418,15 @@ const UserPage = () => {
                                 </div>
                             </div>
                         )}
+
+                        <div className="delete-account-wrapper">
+                            <button
+                                className="delete-account-btn"
+                                onClick={handleDeleteAccount}
+                            >
+                                Видалити обліковий запис
+                            </button>
+                        </div>
 
                         <Footer/>
 

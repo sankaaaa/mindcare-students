@@ -4,7 +4,7 @@ import MainPage from "./pages/MainPage";
 import LoginPage from "./pages/LoginPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import CreateAccount from "./pages/CreateAccount";
-import AllTerapistsPage from "./pages/AllTerapistsPage";
+import AllTherapistsPage from "./pages/AllTherapistsPage";
 import TherapistDetails from "./components/TherapistDetails";
 import UserPage from "./pages/UserPage";
 import FindTherapist from "./pages/FindTherapist";
@@ -32,7 +32,7 @@ function RoutesComponent() {
             <Route path="/login" element={<LoginPage/>}/>
             <Route path="/forgot-password" element={<ResetPasswordPage/>}/>
             <Route path="/create-account" element={<CreateAccount/>}/>
-            <Route path="/all-therapists" element={<AllTerapistsPage/>}/>
+            <Route path="/all-therapists" element={<AllTherapistsPage/>}/>
             <Route path="/all-therapists/:id" element={<TherapistDetails/>}/>
             <Route path="/my-account/:id" element={<UserPage/>}/>
             <Route path="/my-doc-account/:id" element={<TherUserPage/>}/>
