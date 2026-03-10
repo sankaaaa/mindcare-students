@@ -186,6 +186,31 @@ const CreateAccount = () => {
                     {currentStep === 1 && (
                         <>
                             <div className="input-container">
+                                <p>Оберіть тип акаунту:</p>
+
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="role"
+                                        value="patient"
+                                        checked={formData.role === 'patient'}
+                                        onChange={handleChange}
+                                    />
+                                    Пацієнт
+                                </label>
+
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="role"
+                                        value="doctor"
+                                        checked={formData.role === 'doctor'}
+                                        onChange={handleChange}
+                                    />
+                                    Спеціаліст
+                                </label>
+                            </div>
+                            <div className="input-container">
                                 <input
                                     type="text"
                                     placeholder="Ім'я"
