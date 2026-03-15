@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import '../styles/terapists-page.css';
+import '../styles/therapists-page.css';
 
 const MeetFormatFilter = ({onFilterMeetFormat}) => {
     const [selectedFormat, setSelectedFormat] = useState('');

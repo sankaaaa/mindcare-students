@@ -172,7 +172,7 @@ const CreateAccount = () => {
         <div className="createacc-page">
             <div className="logo">
                 <Frame className="frameIcon"/>
-                <div className="logoText">MindCare Students</div>
+                <div className="logoText">MindCare</div>
             </div>
 
             <div className="createacc-container">

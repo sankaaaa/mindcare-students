@@ -1,14 +1,14 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import "../styles/terapist-card.css";
+import "../styles/therapist-card.css";
 
-const TerapistCard = ({name, experience, location, specialties, professions, photo, doctor_id}) => {
+const TherapistCard = ({name, experience, location, specialties, professions, photo, doctor_id}) => {
     const hasMoreSpecialties = specialties.length > 3;
     const displayedSpecialties = hasMoreSpecialties ? specialties.slice(0, 3) : specialties;
     const remainingCount = specialties.length - 3;
 
     return (
-        <div className="card-terapist">
+        <div className="card-therapist">
             <div className="profile-image">
                 {photo ? (
                     <img src={photo} alt={name} className="profile-photo"/>
@@ -42,4 +42,4 @@ const TerapistCard = ({name, experience, location, specialties, professions, pho
     );
 };
 
-export default TerapistCard;
+export default TherapistCard;

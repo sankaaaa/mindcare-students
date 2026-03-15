@@ -78,7 +78,7 @@ const LoginPage = () => {
         <div className="login-page">
             <div className="logo">
                 <Frame className="frameIcon"/>
-                <div className="logoText">MindCare Students</div>
+                <div className="logoText">MindCare</div>
             </div>
 
             <div className="login-container">

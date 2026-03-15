@@ -3,8 +3,8 @@ import {useLocation} from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import supabase from '../config/databaseClient';
-import TerapistCard from "../components/TerapistCard";
-import '../styles/terapists-page.css';
+import TerapistCard from "../components/TherapistCard";
+import '../styles/therapists-page.css';
 import '../styles/loader.css';
 
 const TherapistResults = () => {

@@ -1,4 +1,4 @@
-.card-terapist {
+.card-therapist {
     background-color: #fcfec3;
     border: 2px solid #00410a;
     border-radius: 10px;
@@ -29,7 +29,7 @@
     font-size: 18px;
 }
 
-.card-terapist span {
+.card-therapist span {
     display: block;
     text-align: left;
     margin-top: 5px;

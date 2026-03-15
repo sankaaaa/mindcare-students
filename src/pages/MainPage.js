@@ -12,7 +12,7 @@ import {useNavigate} from 'react-router-dom';
 const MainPage = () => {
     const navigate = useNavigate();
 
-    const handleAllTerapists = () => {
+    const handleAllTherapists = () => {
         navigate('/all-therapists');
     };
 
@@ -46,7 +46,7 @@ const MainPage = () => {
 
                         <span className="separator">або</span>
 
-                        <Button onPress={handleAllTerapists} className="secondary-button">
+                        <Button onPress={handleAllTherapists} className="secondary-button">
                             Усі фахівці
                         </Button>
                     </div>

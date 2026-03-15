@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import TerapistCard from "../components/TerapistCard";
-import "../styles/terapists-page.css";
+import TherapistCard from "../components/TherapistCard";
+import "../styles/therapists-page.css";
 import supabase from '../config/databaseClient';
 import FilterComponent from '../components/FilterComponent';
 import SpecializationFilter from "../components/SpecializationFilter";
@@ -142,7 +142,7 @@ const AllTherapistsPage = () => {
     );
 
     return (
-        <div className="all-terapists-container">
+        <div className="all-therapists-container">
             <Header/>
             <div className="filters">
                 <FilterComponent categories={categories} onFilter={handleFilter}/>
@@ -175,7 +175,7 @@ const AllTherapistsPage = () => {
                 <div>
                     <div className="cards-container">
                         {filteredTherapists.map((therapist, index) => (
-                            <TerapistCard key={index} {...therapist} />
+                            <TherapistCard key={index} {...therapist} />
                         ))}
                     </div>
                     <Footer/>

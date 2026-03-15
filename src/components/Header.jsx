@@ -9,7 +9,7 @@ function Header() {
     const navigate = useNavigate();
     const status = localStorage.getItem('status');
 
-    const handleAllTerapists = () => {
+    const handleAllTherapists = () => {
         navigate('/all-therapists');
     };
 
@@ -68,7 +68,7 @@ function Header() {
         <header className={styles.header}>
             <div className={styles.logo}>
                 <Frame className={styles.frameIcon}/>
-                <div className={styles.logoText}>MindCare Students</div>
+                <div className={styles.logoText}>MindCare</div>
             </div>
 
             <div className={styles.navLinkWrapper}>
@@ -76,7 +76,7 @@ function Header() {
                     Про нас
                 </button>
 
-                <Button onPress={handleAllTerapists} className={styles.navLink}>
+                <Button onPress={handleAllTherapists} className={styles.navLink}>
                     Фахівці
                 </Button>
 
