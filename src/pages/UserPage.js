@@ -37,10 +37,14 @@ const UserPage = () => {
     };
 
     const fetchAppointments = async () => {
+        const nowIso = new Date().toISOString();
+
         const {data, error} = await supabase
             .from('times')
             .select('doctor_id, date')
-            .eq('patient', storedPatientId);
+            .eq('patient', storedPatientId)
+            .gte('date', nowIso)
+            .order('date', { ascending: true });
 
         if (error) {
             console.error('Помилка завантаження записів:', error.message);

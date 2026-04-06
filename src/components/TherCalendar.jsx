@@ -41,6 +41,35 @@ const TherCalendar = () => {
         return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
     };
 
+    const formatSessionTime = (dateString) => {
+        return new Date(dateString).toLocaleTimeString('uk-UA', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    const isPastSession = (sessionDateString) => {
+        const sessionDate = new Date(sessionDateString);
+        const now = new Date();
+        return sessionDate < now;
+    };
+
+    const cleanupOldSlots = async () => {
+        if (!id) return;
+
+        const nowIso = new Date().toISOString();
+
+        const { error } = await supabase
+            .from("times")
+            .delete()
+            .eq("doctor_id", id)
+            .lt("date", nowIso);
+
+        if (error) {
+            console.error("Помилка видалення старих слотів:", error);
+        }
+    };
+
     const generateCalendar = () => {
         const daysOfMonth = [
             31,
@@ -57,7 +86,7 @@ const TherCalendar = () => {
             31,
         ];
 
-        const firstDay = new Date(currentYear, currentMonth);
+        const firstDay = new Date(currentYear, currentMonth, 1);
 
         const days = [];
         for (let i = 0; i < firstDay.getDay(); i++) {
@@ -65,15 +94,29 @@ const TherCalendar = () => {
         }
 
         for (let day = 1; day <= daysOfMonth[currentMonth]; day++) {
-            const selectedSessions = sessionDates.filter(
-                (session) => new Date(session.date).getDate() === day
-            );
+            const selectedSessions = sessionDates.filter((session) => {
+                const sessionDate = new Date(session.date);
+                return (
+                    sessionDate.getDate() === day &&
+                    sessionDate.getMonth() === currentMonth &&
+                    sessionDate.getFullYear() === currentYear &&
+                    !isPastSession(session.date)
+                );
+            });
 
             const isSessionDay = selectedSessions.some(
                 (session) => !session.is_booked
             );
-            const isBooked = selectedSessions.length > 0 &&
+
+            const isBooked =
+                selectedSessions.length > 0 &&
                 selectedSessions.every((session) => session.is_booked);
+
+            const currentCellDate = new Date(currentYear, currentMonth, day);
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+
+            const isPastDay = currentCellDate < todayStart;
 
             days.push(
                 <div
@@ -88,11 +131,13 @@ const TherCalendar = () => {
                     }
                         ${isSessionDay ? "rehearsal-date" : ""}
                         ${isBooked ? "booked-date" : ""}
+                        ${isPastDay ? "past-date" : ""}
                     `}
                     style={{
-                        pointerEvents: isBooked ? "none" : "auto",
+                        pointerEvents: isBooked || isPastDay ? "none" : "auto",
+                        opacity: isPastDay ? 0.4 : 1,
                     }}
-                    onClick={() => !isBooked && handleDayClick(day, isSessionDay)}
+                    onClick={() => !isBooked && !isPastDay && handleDayClick(day, isSessionDay)}
                 >
                     {day}
                 </div>
@@ -112,11 +157,14 @@ const TherCalendar = () => {
                 return;
             }
 
+            await cleanupOldSlots();
+
             const startDate = new Date(
                 currentYear,
                 currentMonth,
                 1
             ).toISOString();
+
             const endDate = new Date(
                 currentYear,
                 currentMonth + 1,
@@ -136,8 +184,9 @@ const TherCalendar = () => {
             if (error) {
                 console.error("Error fetching session dates:", error);
             } else {
-                setSessionDates(data);
+                setSessionDates(data || []);
             }
+
             setLoading(false);
         };
 
@@ -146,22 +195,42 @@ const TherCalendar = () => {
 
     const handleDayClick = (day, isSessionDay) => {
         if (isSessionDay) {
-            const selectedSessions = sessionDates.filter(
-                (session) => new Date(session.date).getDate() === day
-            );
+            const selectedSessions = sessionDates.filter((session) => {
+                const sessionDate = new Date(session.date);
+                return (
+                    sessionDate.getDate() === day &&
+                    sessionDate.getMonth() === currentMonth &&
+                    sessionDate.getFullYear() === currentYear
+                );
+            });
+
             const availableSessions = selectedSessions.filter(
-                (session) => !session.is_booked
+                (session) => !session.is_booked && !isPastSession(session.date)
             );
 
+            if (availableSessions.length === 0) {
+                setShowSessionForm(false);
+                setSelectedDate(null);
+                setSessionTimes([]);
+                setSelectedTime(null);
+                alert("На цю дату вже немає доступних майбутніх слотів.");
+                return;
+            }
+
             setSelectedDate(day);
+
             const times = availableSessions.map((session) =>
-                new Date(session.date).toLocaleTimeString()
+                formatSessionTime(session.date)
             );
+
             setSessionTimes(times);
             setSelectedTime(times.length === 1 ? times[0] : null);
             setShowSessionForm(true);
         } else {
             setShowSessionForm(false);
+            setSelectedDate(null);
+            setSessionTimes([]);
+            setSelectedTime(null);
         }
     };
 
@@ -176,7 +245,9 @@ const TherCalendar = () => {
         const selectedSession = sessionDates.find(
             (session) =>
                 new Date(session.date).getDate() === selectedDate &&
-                new Date(session.date).toLocaleTimeString() === selectedTime &&
+                new Date(session.date).getMonth() === currentMonth &&
+                new Date(session.date).getFullYear() === currentYear &&
+                formatSessionTime(session.date) === selectedTime &&
                 !session.is_booked
         );
 
@@ -185,7 +256,11 @@ const TherCalendar = () => {
             return;
         }
 
-        // 1. Оновлюємо запис у Supabase
+        if (isPastSession(selectedSession.date)) {
+            alert("Не можна записатися на дату або час, що вже минули.");
+            return;
+        }
+
         const { error: updateError } = await supabase
             .from("times")
             .update({ patient: patientId, is_booked: true })
@@ -198,7 +273,6 @@ const TherCalendar = () => {
             return;
         }
 
-        // 2. Тягнемо дані лікаря та пацієнта з Supabase
         const { data: doctorData, error: docError } = await supabase
             .from("doctors")
             .select("first_name, last_name, email")
@@ -227,12 +301,11 @@ const TherCalendar = () => {
             ? `${patientData.first_name} ${patientData.last_name}`
             : "Пацієнт";
 
-        const dateStr = `${selectedDate}.${currentMonth + 1}.${currentYear}`;
-        const timeStr = selectedTime;
+        const selectedSessionDateObj = new Date(selectedSession.date);
+        const dateStr = selectedSessionDateObj.toLocaleDateString('uk-UA');
+        const timeStr = formatSessionTime(selectedSession.date);
 
-        // 3. Відправляємо листи через бекенд (порт 4000!)
         try {
-            // Лист пацієнту: підтвердження
             if (patientEmail) {
                 await fetch("http://localhost:4000/send-booking-email", {
                     method: "POST",
@@ -246,7 +319,6 @@ const TherCalendar = () => {
                 });
             }
 
-            // Лист лікарю: новий клієнт
             if (therapistEmail) {
                 await fetch("http://localhost:4000/send-new-client-email", {
                     method: "POST",
@@ -268,7 +340,6 @@ const TherCalendar = () => {
             );
         }
 
-        // 4. Оновлюємо локальний стейт
         setSessionDates((prevDates) =>
             prevDates.map((session) =>
                 session.date === selectedSession.date
@@ -276,11 +347,16 @@ const TherCalendar = () => {
                     : session
             )
         );
+
         setShowSessionForm(false);
+        setSelectedDate(null);
+        setSessionTimes([]);
+        setSelectedTime(null);
     };
 
     const changeMonth = (direction) => {
         setLoading(true);
+
         if (direction === "prev") {
             setCurrentMonth((prevMonth) => (prevMonth === 0 ? 11 : prevMonth - 1));
             setCurrentYear((prevYear) =>
@@ -324,6 +400,7 @@ const TherCalendar = () => {
                         </span>
                     </div>
                 </div>
+
                 <div className="calendar-body">
                     <div className="calendar-week-days">
                         <div>Нд</div>
@@ -334,6 +411,7 @@ const TherCalendar = () => {
                         <div>Пт</div>
                         <div>Сб</div>
                     </div>
+
                     <div className="calendar-days">
                         {loading ? <div>Loading...</div> : generateCalendar()}
                     </div>
@@ -342,9 +420,9 @@ const TherCalendar = () => {
                 {showSessionForm && (
                     <div className="session-form">
                         <h4>
-                            Дата запису: {selectedDate}.{currentMonth + 1}.
-                            {currentYear}
+                            Дата запису: {selectedDate}.{currentMonth + 1}.{currentYear}
                         </h4>
+
                         {sessionTimes.length > 1 ? (
                             sessionTimes.map((time, index) => (
                                 <label key={index}>
@@ -360,6 +438,7 @@ const TherCalendar = () => {
                         ) : (
                             <p>{sessionTimes[0]}</p>
                         )}
+
                         {isPatient && (
                             <button
                                 className="confirmsession"

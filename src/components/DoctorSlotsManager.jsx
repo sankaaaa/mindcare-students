@@ -15,10 +15,13 @@ const DoctorSlotsManager = ({ doctorId }) => {
 
         setLoading(true);
 
+        const nowIso = new Date().toISOString();
+
         const { data, error } = await supabase
             .from('times')
-            .select('doctor_id, date, is_booked, patient')
+            .select('id, doctor_id, date, is_booked, patient')
             .eq('doctor_id', Number(doctorId))
+            .gte('date', nowIso)
             .order('date', { ascending: true });
 
         if (error) {

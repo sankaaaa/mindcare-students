@@ -13,11 +13,15 @@ const Appointments = ({doctorId}) => {
             }
 
             try {
+                const nowIso = new Date().toISOString();
+
                 const {data: timesData, error: timesError} = await supabase
                     .from('times')
                     .select('patient, date')
                     .eq('doctor_id', Number(doctorId))
-                    .not('patient', 'is', null);
+                    .not('patient', 'is', null)
+                    .gte('date', nowIso)
+                    .order('date', { ascending: true });
 
                 if (timesError) throw timesError;
 
