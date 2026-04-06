@@ -140,9 +140,18 @@
 }
 
 .app-section-content-doc {
-    min-height: 53vh;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    gap: 30px;
+    width: 100%;
+    align-items: center;
+}
+
+.slots-manager-wrapper,
+.appointments-wrapper {
+    width: 90%;
+    max-width: 1200px;
+    box-sizing: border-box;
 }
 
 .cancel-btn, .edit-btn {
@@ -180,5 +189,102 @@
 
 .delete-account-btn:hover {
     background-color: #dc2626;
+}
+
+.availability-manager {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #fcfec3;
+    border: 2px solid #00410a;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    font-family: 'Craftwork Grotesk', sans-serif;
+    color: #00410a;
+}
+
+.availability-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-end;
+    margin-bottom: 25px;
+}
+
+.availability-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.availability-field label {
+    font-weight: 600;
+    color: #00410a;
+}
+
+.availability-field input {
+    padding: 10px 12px;
+    border: 2px solid #00410a;
+    border-radius: 8px;
+    background-color: #fefcbf;
+    color: #00410a;
+    font-family: 'Craftwork Grotesk', sans-serif;
+}
+
+.add-slot-btn {
+    height: fit-content;
+    padding: 12px 20px;
+}
+
+.availability-subtitle {
+    font-size: 22px;
+    margin-bottom: 15px;
+    color: #00410a;
+}
+
+.availability-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.availability-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    border: 2px solid #00410a;
+    border-radius: 10px;
+    padding: 15px 18px;
+    background-color: #fefcbf;
+}
+
+.availability-info p {
+    margin: 4px 0;
+    color: #00410a;
+}
+
+.free-slot {
+    background-color: #fefcbf;
+}
+
+.booked-slot {
+    background-color: #F1F3BA;
+}
+
+.delete-slot-btn {
+    padding: 10px 16px;
+    background-color: #fcfec3;
+    color: #00410a;
+    border: 2px solid #00410a;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Craftwork Grotesk', sans-serif;
+    font-weight: 600;
+}
+
+.delete-slot-btn:hover {
+    background-color: #00410a;
+    color: #fcfec3;
 }
 
