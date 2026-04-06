@@ -8,6 +8,10 @@ app.use(express.json());
 
 const emailProvider = new EmailProvider();
 
+emailProvider.verifyConnection().catch((err) => {
+    console.error("SMTP verify error:", err);
+});
+
 app.post("/send-registration-email", async (req, res) => {
     try {
         const { email, name } = req.body;
@@ -15,7 +19,10 @@ app.post("/send-registration-email", async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         console.error("send-registration-email error:", err);
-        res.status(500).json({ error: true });
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 });
 
@@ -26,7 +33,10 @@ app.post("/send-booking-email", async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         console.error("send-booking-email error:", err);
-        res.status(500).json({ error: true });
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 });
 
@@ -37,7 +47,10 @@ app.post("/send-cancel-email", async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         console.error("send-cancel-email error:", err);
-        res.status(500).json({ error: true });
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 });
 
@@ -48,7 +61,10 @@ app.post("/send-reminder-24h", async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         console.error("send-reminder-24h error:", err);
-        res.status(500).json({ error: true });
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 });
 
@@ -59,7 +75,10 @@ app.post("/send-reminder-1h", async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         console.error("send-reminder-1h error:", err);
-        res.status(500).json({ error: true });
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 });
 
@@ -70,7 +89,10 @@ app.post("/send-new-client-email", async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         console.error("send-new-client-email error:", err);
-        res.status(500).json({ error: true });
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 });
 
@@ -81,7 +103,10 @@ app.post("/send-therapist-cancel", async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         console.error("send-therapist-cancel error:", err);
-        res.status(500).json({ error: true });
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 });
 
@@ -92,7 +117,10 @@ app.post("/send-password-changed-email", async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         console.error("send-password-changed-email error:", err);
-        res.status(500).json({ error: true });
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 });
 

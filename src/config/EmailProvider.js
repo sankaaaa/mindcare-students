@@ -1,9 +1,18 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
-dotenv.config();
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 export class EmailProvider {
     constructor() {
+        console.log("SMTP_USER:", process.env.SMTP_USER);
+        console.log("SMTP_PASS:", process.env.SMTP_PASS ? "є пароль" : "нема пароля");
+
         this.transporter = nodemailer.createTransport({
             host: "smtp.ukr.net",
             port: 465,
@@ -17,9 +26,14 @@ export class EmailProvider {
         this.sender = process.env.SMTP_USER || "mindcare_platform@ukr.net";
     }
 
+    async verifyConnection() {
+        await this.transporter.verify();
+        console.log("SMTP підключення успішне");
+    }
+
     async sendMail(to, subject, html) {
         return this.transporter.sendMail({
-            from: `"MindCare Students" <${this.sender}>`,
+            from: `"MindCare" <${this.sender}>`,
             to,
             subject,
             html
@@ -29,7 +43,7 @@ export class EmailProvider {
     async sendRegistrationEmail(to, name) {
         return this.sendMail(
             to,
-            "Ласкаво просимо до MindCare Students!",
+            "Ласкаво просимо до MindCare!",
             `
             <h2>Вітаємо, ${name}!</h2>
             <p>Ваш акаунт успішно створено. Тепер ви можете шукати спеціалістів та записуватись на консультації.</p>
@@ -120,10 +134,10 @@ export class EmailProvider {
             to,
             "Пароль успішно змінено",
             `
-        <h2>Ваш пароль було змінено</h2>
-        <p>Якщо це були не ви, негайно змініть пароль ще раз та зверніться в підтримку.</p>
-        <p style="color:gray; font-size:12px;">Це автоматичний лист — не відповідайте на нього.</p>
-        `
+            <h2>Ваш пароль було змінено</h2>
+            <p>Якщо це були не ви, негайно змініть пароль ще раз та зверніться в підтримку.</p>
+            <p style="color:gray; font-size:12px;">Це автоматичний лист — не відповідайте на нього.</p>
+            `
         );
     }
 }
