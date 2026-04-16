@@ -38,7 +38,7 @@ const TherUserPage = () => {
                 .from('doctors')
                 .select(
                     'doctor_id, first_name, last_name, specialization, experience, email, phone_number, ' +
-                    'meet_fomat, city, doc_sex, doc_date, doc_session, doc_rev, doc_lang, doc_education, doc_way, doc_photo'
+                    'meet_fomat, city, doc_sex, doc_date, doc_session, doc_rev, doc_lang, doc_about, doc_education, doc_way, doc_photo'
                 )
                 .eq('doctor_id', Number(resolvedDoctorId))
                 .single();
@@ -57,6 +57,52 @@ const TherUserPage = () => {
 
     const handleTabChange = (tab) => {
         setActiveTab(tab);
+    };
+
+    const handlePhotoUpload = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        const maxSizeBytes = 2 * 1024 * 1024; // 2 MB
+
+        if (!allowedTypes.includes(file.type)) {
+            alert('Можна завантажувати лише JPG, JPEG, PNG або WEBP.');
+            return;
+        }
+
+        if (file.size > maxSizeBytes) {
+            alert('Файл завеликий. Максимальний розмір — 2 MB.');
+            return;
+        }
+
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `doctor-${resolvedDoctorId}-${Date.now()}.${fileExt}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('doctor-photos')
+                .upload(fileName, file);
+
+            if (uploadError) {
+                console.error('uploadError:', uploadError);
+                throw uploadError;
+            }
+
+            const { data } = supabase.storage
+                .from('doctor-photos')
+                .getPublicUrl(fileName);
+
+            setEditedDoctor((prev) => ({
+                ...prev,
+                doc_photo: data.publicUrl
+            }));
+
+            alert("Фото завантажено. Натисніть «Зберегти», щоб зберегти зміни в профілі.");
+        } catch (err) {
+            console.error("Помилка завантаження фото:", err);
+            alert(`Не вдалося завантажити фото: ${err.message || 'невідома помилка'}`);
+        }
     };
 
     const saveChanges = async () => {
@@ -254,7 +300,21 @@ const TherUserPage = () => {
                                     </section>
 
                                     <section className="section-doc">
-                                        <img src={doctorData.doc_photo} alt="doctor" className="doc-photo"/>
+                                        <img
+                                            src={editedDoctor.doc_photo || doctorData.doc_photo || "default-photo.png"}
+                                            alt="doctor"
+                                            className="doc-photo"
+                                        />
+
+                                        {isEditing && (
+                                            <div className="photo-upload-block">
+                                                <input
+                                                    type="file"
+                                                    accept="image/jpeg,image/png,image/webp"
+                                                    onChange={handlePhotoUpload}
+                                                />
+                                            </div>
+                                        )}
                                     </section>
 
                                     <section className="section-doc">

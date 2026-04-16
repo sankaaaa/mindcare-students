@@ -288,3 +288,12 @@
     color: #fcfec3;
 }
 
+.photo-upload-block {
+    margin-top: 15px;
+}
+
+.photo-upload-block input[type="file"] {
+    font-family: var(--font-family);
+    color: var(--main-color);
+}
+
