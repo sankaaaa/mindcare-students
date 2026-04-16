@@ -167,9 +167,9 @@ const TherapistDetails = () => {
         return <div>Therapist not found.</div>;
     }
 
-    let location = therapist.meet_fomat;
-    if (therapist.meet_fomat.includes('Офлайн')) {
-        location = therapist.meet_fomat.replace('Офлайн', `Офлайн: ${therapist.city}`);
+    let location = therapist.meet_fomat || 'Формат не вказано';
+    if (therapist.meet_fomat && therapist.meet_fomat.includes('Офлайн')) {
+        location = therapist.meet_fomat.replace('Офлайн', `Офлайн: ${therapist.city || ''}`);
     }
 
     const age = therapist.doc_date ? calculateAge(therapist.doc_date) : null;
@@ -228,7 +228,7 @@ const TherapistDetails = () => {
                                 <img id="langimg" src={Lang} alt="Lang icon"/>
                                 <span>Мова надання послуг:</span>
                             </div>
-                            <p>{therapist.doc_lang}</p>
+                            <p>{therapist.doc_lang || 'Не вказано'}</p>
                         </div>
                     </div>
                 </div>
@@ -267,17 +267,17 @@ const TherapistDetails = () => {
 
                 {activeSection === 'about' && (
                     <div className="section-content">
-                        <p>{therapist.doc_about}</p>
+                        <p>{therapist.doc_about || 'Не вказано'}</p>
                     </div>
                 )}
                 {activeSection === 'education' && (
                     <div className="section-content">
-                        <p>{therapist.doc_education}</p>
+                        <p>{therapist.doc_education || 'Не вказано'}</p>
                     </div>
                 )}
                 {activeSection === 'work' && (
                     <div className="section-content">
-                        <p>{therapist.doc_way}</p>
+                        <p>{therapist.doc_way || 'Не вказано'}</p>
                     </div>
                 )}
             </div>

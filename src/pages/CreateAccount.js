@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 import '../styles/create-account.css';
 import {ReactComponent as Frame} from '../assets/Frame.svg';
@@ -6,6 +6,7 @@ import supabase from '../config/databaseClient';
 
 const CreateAccount = () => {
     const [currentStep, setCurrentStep] = useState(1);
+    const [categories, setCategories] = useState([]);
     const [formData, setFormData] = useState({
         role: '',
         firstName: '',
@@ -18,11 +19,29 @@ const CreateAccount = () => {
         login: '',
         password: '',
         pricePerSession: '',
-        specializations: [],
+        specializations: [],      // психолог / психіатр / психотерапевт
+        categoryIds: [],          // категорії з categories
     });
 
     const [error, setError] = useState('');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            const { data, error } = await supabase
+                .from('categories')
+                .select('category_id, name')
+                .order('category_id', { ascending: true });
+
+            if (error) {
+                console.error('Помилка завантаження категорій:', error);
+            } else {
+                setCategories(data || []);
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -41,6 +60,19 @@ const CreateAccount = () => {
                 specializations: exists
                     ? prev.specializations.filter(item => item !== value)
                     : [...prev.specializations, value]
+            };
+        });
+    };
+
+    const handleCategoryChange = (categoryId) => {
+        setFormData(prev => {
+            const exists = prev.categoryIds.includes(categoryId);
+
+            return {
+                ...prev,
+                categoryIds: exists
+                    ? prev.categoryIds.filter(id => id !== categoryId)
+                    : [...prev.categoryIds, categoryId]
             };
         });
     };
@@ -65,14 +97,23 @@ const CreateAccount = () => {
 
             if (formData.role === 'doctor') {
                 if (!formData.email || !formData.phone || formData.specializations.length === 0) {
-                    return setError("Заповніть поля та виберіть хоча б одну спеціалізацію.");
+                    return setError("Заповніть email, телефон і виберіть хоча б одну кваліфікацію.");
                 }
             }
         }
 
         if (currentStep === 3 && formData.role === 'doctor') {
+            if (formData.categoryIds.length === 0) {
+                return setError("Оберіть хоча б одну категорію, з якою працює спеціаліст.");
+            }
+        }
+
+        if (
+            (currentStep === 3 && formData.role === 'patient') ||
+            (currentStep === 4 && formData.role === 'doctor')
+        ) {
             if (!formData.login || !formData.password) {
-                return setError("Заповніть всі поля цього кроку.");
+                return setError("Заповніть логін і пароль.");
             }
         }
 
@@ -150,7 +191,7 @@ const CreateAccount = () => {
 
                 const specializationValue = formData.specializations.join(', ');
 
-                const {error: insertError} = await supabase
+                const {error: insertDoctorError} = await supabase
                     .from('doctors')
                     .insert([
                         {
@@ -180,7 +221,18 @@ const CreateAccount = () => {
                         }
                     ]);
 
-                if (insertError) throw insertError;
+                if (insertDoctorError) throw insertDoctorError;
+
+                const doctorCategoriesRows = formData.categoryIds.map((categoryId) => ({
+                    doctor_id: nextDoctorId,
+                    category_id: categoryId,
+                }));
+
+                const { error: insertCategoriesError } = await supabase
+                    .from('doctor_categories')
+                    .insert(doctorCategoriesRows);
+
+                if (insertCategoriesError) throw insertCategoriesError;
 
                 sessionStorage.setItem("email", formData.email);
                 sessionStorage.setItem("doctor_id", nextDoctorId);
@@ -206,6 +258,9 @@ const CreateAccount = () => {
             setError('Помилка при створенні акаунту: ' + (error.message || 'невідома помилка'));
         }
     };
+
+    const isDoctorLastStep = currentStep === 4 && formData.role === 'doctor';
+    const isPatientLastStep = currentStep === 3 && formData.role === 'patient';
 
     return (
         <div className="createacc-page">
@@ -357,7 +412,7 @@ const CreateAccount = () => {
 
                             {formData.role === 'doctor' && (
                                 <div className="input-container">
-                                    <p>Спеціалізація:</p>
+                                    <p>Кваліфікація:</p>
 
                                     <label>
                                         <input
@@ -397,7 +452,33 @@ const CreateAccount = () => {
                         </>
                     )}
 
-                    {currentStep === 3 && (
+                    {currentStep === 3 && formData.role === 'doctor' && (
+                        <>
+                            <div className="input-container">
+                                <p>Оберіть категорії, з якими працює спеціаліст:</p>
+
+                                {categories.map((category) => (
+                                    <label key={category.category_id}>
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.categoryIds.includes(category.category_id)}
+                                            onChange={() => handleCategoryChange(category.category_id)}
+                                        />
+                                        {category.name}
+                                    </label>
+                                ))}
+                            </div>
+
+                            <button type="button" className="prev-button" onClick={prevStep}>
+                                Назад
+                            </button>
+                            <button type="button" className="login-button" onClick={nextStep}>
+                                Далі
+                            </button>
+                        </>
+                    )}
+
+                    {(isPatientLastStep || isDoctorLastStep) && (
                         <>
                             <div className="input-container">
                                 <input

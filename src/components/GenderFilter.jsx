@@ -5,7 +5,7 @@ const GenderFilter = ({onFilterGender}) => {
     const [selectedGender, setSelectedGender] = useState('');
     const [isOpen, setIsOpen] = useState(false);
 
-    const genderOptions = ['Чоловік', 'Жінка'];
+    const genderOptions = ['Чоловік', 'Жінка', 'Інше'];
 
     const handleRadioChange = (gender) => {
         setSelectedGender(gender);

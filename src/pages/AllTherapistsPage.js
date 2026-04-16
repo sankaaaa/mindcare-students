@@ -92,9 +92,9 @@ const AllTherapistsPage = () => {
                     const gender = doctor.doc_sex || 'Не вказано';
                     const photo = doctor.doc_photo || '';
 
-                    let location = meetFormat;
-                    if (meetFormat.includes('Офлайн') && city) {
-                        location = meetFormat.replace('Офлайн', `Офлайн: ${city}`);
+                    let location = doctor.meet_fomat || 'Формат не вказано';
+                    if (doctor.meet_fomat && doctor.meet_fomat.includes('Офлайн')) {
+                        location = doctor.meet_fomat.replace('Офлайн', `Офлайн: ${doctor.city || ''}`);
                     }
 
                     return {
